@@ -1,0 +1,53 @@
+{
+  "identity_schema_version": "1.0",
+  "mission": {
+    "core_purpose": "Build a Cognitive Operating System for Teams to align collective intelligence.",
+    "horizon": "5-year timeline"
+  },
+  "vision": {
+    "target_state": "Every enterprise workspace executes with fluid, friction-free AI-human cognitive loops."
+  },
+  "values": [
+    {
+      "name": "Rigorous Theory",
+      "description": "Establish deep, mathematically backed conceptual foundations before writing code.",
+      "weight": 0.8
+    },
+    {
+      "name": "Transparency",
+      "description": "Keep all decision rationale audit trails readable to humans.",
+      "weight": 0.9
+    }
+  ],
+  "principles": [
+    "Prioritize collective memory consolidation over immediate storage.",
+    "Minimize coordination overhead at all cost."
+  ],
+  "constraints": {
+    "resource_limits": {
+      "max_monthly_compute_budget_usd": 500.0
+    },
+    "security": {
+      "allow_external_execution_without_approval": false
+    }
+  },
+  "current_strategy": {
+    "focus": "Theory Phase and conceptual documentation modeling.",
+    "stage": "Pre-MVP (Stage 2)"
+  },
+  "risk_appetite": {
+    "operational_risk": "low",
+    "experimental_risk": "high"
+  },
+  "culture": {
+    "communication_style": "rigorous, concise, research-grade"
+  },
+  "goals": [
+    {
+      "id": "goal_01",
+      "description": "Complete Cognitive OS Phase 1 modules specifications.",
+      "target_date": "2026-07-01",
+      "status": "pending"
+    }
+  ]
+}

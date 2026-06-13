@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cognitive OS - Workspace Dashboard</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #070a13 0%, #0c0f1d 50%, #11142a 100%);
+            --card-bg: rgba(18, 22, 41, 0.7);
+            --border-color: rgba(99, 102, 241, 0.15);
+            --border-glow: rgba(99, 102, 241, 0.4);
+            --cyan: #06b6d4;
+            --violet: #8b5cf6;
+            --rose: #f43f5e;
+            --emerald: #10b981;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 2rem;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism containers */
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(99, 102, 241, 0.3);
+            box-shadow: 0 12px 40px 0 rgba(99, 102, 241, 0.15);
+        }
+
+        /* Layout */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+        }
+
+        .header h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 2.2rem;
+            background: linear-gradient(to right, #ffffff, var(--cyan), var(--violet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--emerald);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--emerald);
+            border-radius: 50%;
+            animation: pulse 1.8s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.9); opacity: 0.6; }
+            50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 10px var(--emerald); }
+            100% { transform: scale(0.9); opacity: 0.6; }
+        }
+
+        /* Scorecard */
+        .scorecard-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--violet);
+        }
+
+        .metric-card.cyan::before { background: var(--cyan); }
+        .metric-card.rose::before { background: var(--rose); }
+        .metric-card.emerald::before { background: var(--emerald); }
+
+        .metric-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            color: #ffffff;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Main Dashboard Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 0.75rem;
+        }
+
+        /* Graph visualization */
+        .graph-card {
+            padding: 1.5rem;
+            height: 550px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .graph-container {
+            flex-grow: 1;
+            background: rgba(8, 10, 20, 0.6);
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        svg#network-graph {
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+        }
+
+        svg#network-graph:active {
+            cursor: grabbing;
+        }
+
+        /* Details & Logs */
+        .details-column {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .log-card {
+            padding: 1.5rem;
+            height: 260px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .log-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            padding-right: 0.5rem;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.25);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 102, 241, 0.5);
+        }
+
+        .log-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            transition: background 0.2s;
+        }
+
+        .log-item:hover {
+            background: rgba(99, 102, 241, 0.05);
+            border-color: rgba(99, 102, 241, 0.15);
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            margin-right: 6px;
+        }
+
+        .badge-intent { background: rgba(6, 182, 212, 0.15); color: var(--cyan); border: 1px solid rgba(6, 182, 212, 0.3); }
+        .badge-sentiment { background: rgba(139, 92, 246, 0.15); color: var(--violet); border: 1px solid rgba(139, 92, 246, 0.3); }
+        .badge-confidence { background: rgba(16, 185, 129, 0.15); color: var(--emerald); border: 1px solid rgba(16, 185, 129, 0.3); }
+
+        .decision-card {
+            padding: 1.5rem;
+            height: 260px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .decision-item {
+            background: rgba(99, 102, 241, 0.03);
+            border-left: 3px solid var(--violet);
+            padding: 10px 14px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .decision-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #ffffff;
+        }
+
+        .decision-desc {
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+        }
+
+        .decision-stats {
+            display: flex;
+            gap: 12px;
+            font-size: 0.8rem;
+            color: var(--cyan);
+        }
+
+        /* SVG styles */
+        .node circle {
+            fill: #1e293b;
+            stroke: var(--cyan);
+            stroke-width: 2.5px;
+            cursor: pointer;
+            transition: filter 0.2s, stroke-width 0.2s;
+        }
+
+        .node:hover circle {
+            filter: drop-shadow(0 0 8px var(--cyan));
+            stroke-width: 4px;
+        }
+
+        .node.actor circle {
+            stroke: var(--violet);
+        }
+
+        .node.document circle {
+            stroke: var(--rose);
+        }
+
+        .node text {
+            fill: var(--text-main);
+            font-size: 11px;
+            font-family: 'Outfit', sans-serif;
+            pointer-events: none;
+            text-anchor: middle;
+        }
+
+        .link {
+            stroke: rgba(255, 255, 255, 0.08);
+            stroke-width: 1.5px;
+            fill: none;
+        }
+
+        .link-label {
+            fill: var(--text-muted);
+            font-size: 9px;
+            text-anchor: middle;
+            pointer-events: none;
+            background: #000;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="glass-card header">
+        <div>
+            <h1>Cognitive Operating System</h1>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 4px;">Collective Intelligence Dashboard</p>
+        </div>
+        <div class="status-badge">
+            <div class="status-dot"></div>
+            <span>Connected</span>
+        </div>
+    </div>
+
+    <!-- Scorecard -->
+    <div class="scorecard-row">
+        <div class="glass-card metric-card cyan">
+            <div class="metric-value" id="count-semantics">-</div>
+            <div class="metric-label">Semantic Facts</div>
+        </div>
+        <div class="glass-card metric-card">
+            <div class="metric-value" id="count-episodes">-</div>
+            <div class="metric-label">Episodic Logs</div>
+        </div>
+        <div class="glass-card metric-card rose">
+            <div class="metric-value" id="count-decisions">-</div>
+            <div class="metric-label">Decisions Logged</div>
+        </div>
+        <div class="glass-card metric-card emerald">
+            <div class="metric-value" id="compression-ratio">-</div>
+            <div class="metric-label">Compression</div>
+        </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="main-grid">
+        <!-- Graph Area -->
+        <div class="glass-card graph-card">
+            <div class="section-title">
+                <span>🕸️</span> Active Semantic Memory Graph
+            </div>
+            <div class="graph-container">
+                <svg id="network-graph"></svg>
+            </div>
+        </div>
+
+        <!-- Details Column -->
+        <div class="details-column">
+            <!-- Episodic Logs -->
+            <div class="glass-card log-card">
+                <div class="section-title">
+                    <span>💬</span> Episodic Conversations
+                </div>
+                <div class="log-list" id="episodes-list">
+                    <p style="color: var(--text-muted); text-align: center; margin-top: 2rem;">Loading episodes...</p>
+                </div>
+            </div>
+
+            <!-- Decisions -->
+            <div class="glass-card decision-card">
+                <div class="section-title">
+                    <span>⚖️</span> Decision Audit Log
+                </div>
+                <div class="log-list" id="decisions-list">
+                    <p style="color: var(--text-muted); text-align: center; margin-top: 2rem;">Loading decisions...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fetch API Data
+        async function fetchMetrics() {
+            try {
+                const res = await fetch('/api/metrics');
+                const data = await res.json();
+                document.getElementById('count-semantics').innerText = data.semantic_count;
+                document.getElementById('count-episodes').innerText = data.episodic_count;
+                document.getElementById('count-decisions').innerText = data.decision_count;
+                document.getElementById('compression-ratio').innerText = Math.round(data.compression_ratio * 100) + '%';
+            } catch (e) {
+                console.error("Error fetching metrics", e);
+            }
+        }
+
+        async function fetchDecisions() {
+            try {
+                const res = await fetch('/api/decisions');
+                const data = await res.json();
+                const list = document.getElementById('decisions-list');
+                list.innerHTML = '';
+                
+                if (data.length === 0) {
+                    list.innerHTML = `<p style="color: var(--text-muted); text-align: center; padding: 2rem;">No decision trajectories logged yet.</p>`;
+                    return;
+                }
+
+                data.forEach(item => {
+                    const content = item.content;
+                    const timeStr = new Date(item.timestamp * 1000).toLocaleTimeString();
+                    
+                    const div = document.createElement('div');
+                    div.className = 'decision-item';
+                    div.innerHTML = `
+                        <div class="decision-title">Goal: ${content.target_state}</div>
+                        <div class="decision-desc">Recommendation: <strong style="color: #ffffff;">${content.recommendation}</strong></div>
+                        <div class="decision-stats">
+                            <span>🕒 ${timeStr}</span>
+                            <span>⚡ Options: ${content.simulations.length}</span>
+                        </div>
+                    `;
+                    list.appendChild(div);
+                });
+            } catch (e) {
+                console.error("Error fetching decisions", e);
+            }
+        }
+
+        async function fetchMemory() {
+            try {
+                const res = await fetch('/api/memory');
+                const data = await res.json();
+                
+                // Render Episodes
+                const epList = document.getElementById('episodes-list');
+                epList.innerHTML = '';
+                
+                if (data.episodes.length === 0) {
+                    epList.innerHTML = `<p style="color: var(--text-muted); text-align: center; padding: 2rem;">No conversations recorded yet.</p>`;
+                } else {
+                    // Sort descending by created_at
+                    data.episodes.sort((a, b) => b.created_at - a.created_at);
+                    
+                    data.episodes.forEach(ep => {
+                        const div = document.createElement('div');
+                        div.className = 'log-item';
+                        
+                        let text = ep.content.text || JSON.stringify(ep.content);
+                        let resolved = ep.content.resolved_text;
+                        
+                        let badges = '';
+                        if (ep.content.intent) {
+                            badges += `<span class="badge badge-intent">${ep.content.intent}</span>`;
+                        }
+                        if (ep.content.sentiment) {
+                            badges += `<span class="badge badge-sentiment">${ep.content.sentiment}</span>`;
+                        }
+                        badges += `<span class="badge badge-confidence">conf: ${(ep.confidence * 100).toFixed(0)}%</span>`;
+
+                        div.innerHTML = `
+                            <div style="margin-bottom: 6px; font-weight: 500;">${text}</div>
+                            ${resolved ? `<div style="font-size: 0.85rem; color: var(--cyan); margin-bottom: 8px;">Resolved Context: "${resolved}"</div>` : ''}
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>${badges}</div>
+                                <span style="font-size: 0.75rem; color: var(--text-muted);">Retrievals: ${ep.access_count}</span>
+                            </div>
+                        `;
+                        epList.appendChild(div);
+                    });
+                }
+                
+                // Draw Network Graph
+                renderGraph(data.semantics);
+            } catch (e) {
+                console.error("Error fetching memory graph", e);
+            }
+        }
+
+        // Custom Force-Directed Layout for SVG
+        function renderGraph(triples) {
+            const svg = document.getElementById('network-graph');
+            svg.innerHTML = ''; // Clear SVG
+            
+            if (triples.length === 0) {
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", "50%");
+                text.setAttribute("y", "50%");
+                text.setAttribute("fill", "#94a3b8");
+                text.setAttribute("text-anchor", "middle");
+                text.textContent = "Graph empty. Run sleep consolidation to build facts.";
+                svg.appendChild(text);
+                return;
+            }
+
+            // Extract unique nodes and links
+            const nodesMap = new Map();
+            const links = [];
+
+            triples.forEach(t => {
+                const s = t.subject;
+                const o = t.object;
+                const p = t.predicate;
+
+                if (!nodesMap.has(s)) {
+                    nodesMap.set(s, { id: s, label: s, type: getNodeType(s) });
+                }
+                if (!nodesMap.has(o)) {
+                    nodesMap.set(o, { id: o, label: o, type: getNodeType(o) });
+                }
+
+                links.push({
+                    source: s,
+                    target: o,
+                    label: p
+                });
+            });
+
+            const nodes = Array.from(nodesMap.values());
+
+            // Simple spring force physics implementation
+            const width = svg.clientWidth || 600;
+            const height = svg.clientHeight || 500;
+
+            // Random initialization coordinates around center
+            nodes.forEach(n => {
+                n.x = width / 2 + (Math.random() - 0.5) * 200;
+                n.y = height / 2 + (Math.random() - 0.5) * 200;
+                n.vx = 0;
+                n.vy = 0;
+            });
+
+            // Physics constants
+            const kAttractive = 0.05;
+            const kRepulsive = 2500;
+            const kGravity = 0.02;
+            const iterations = 80;
+
+            // Run simulation steps
+            for (let step = 0; step < iterations; step++) {
+                // 1. Repulsive forces between nodes
+                for (let i = 0; i < nodes.length; i++) {
+                    const n1 = nodes[i];
+                    for (let j = i + 1; j < nodes.length; j++) {
+                        const n2 = nodes[j];
+                        const dx = n2.x - n1.x;
+                        const dy = n2.y - n1.y;
+                        const dist = Math.sqrt(dx*dx + dy*dy) || 1.0;
+                        
+                        // force magnitude
+                        const f = kRepulsive / (dist * dist);
+                        const fx = (dx / dist) * f;
+                        const fy = (dy / dist) * f;
+
+                        n1.vx -= fx;
+                        n1.vy -= fy;
+                        n2.vx += fx;
+                        n2.vy += fy;
+                    }
+                }
+
+                // 2. Attractive forces along links
+                links.forEach(link => {
+                    const sNode = nodesMap.get(link.source);
+                    const tNode = nodesMap.get(link.target);
+                    if (sNode && tNode) {
+                        const dx = tNode.x - sNode.x;
+                        const dy = tNode.y - sNode.y;
+                        const dist = Math.sqrt(dx*dx + dy*dy) || 1.0;
+                        const force = kAttractive * (dist - 100); // ideal length 100
+
+                        const fx = (dx / dist) * force;
+                        const fy = (dy / dist) * force;
+
+                        sNode.vx += fx;
+                        sNode.vy += fy;
+                        tNode.vx -= fx;
+                        tNode.vy -= fy;
+                    }
+                });
+
+                // 3. Gravity towards center and position updates
+                nodes.forEach(n => {
+                    const dx = width / 2 - n.x;
+                    const dy = height / 2 - n.y;
+                    n.vx += dx * kGravity;
+                    n.vy += dy * kGravity;
+
+                    // Apply damping
+                    n.vx *= 0.8;
+                    n.vy *= 0.8;
+
+                    // Update pos
+                    n.x += n.vx;
+                    n.y += n.vy;
+                });
+            }
+
+            // Draw Links (lines)
+            links.forEach(link => {
+                const s = nodesMap.get(link.source);
+                const t = nodesMap.get(link.target);
+                if (s && t) {
+                    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    line.setAttribute("class", "link");
+                    line.setAttribute("x1", s.x);
+                    line.setAttribute("y1", s.y);
+                    line.setAttribute("x2", t.x);
+                    line.setAttribute("y2", t.y);
+                    svg.appendChild(line);
+
+                    // Add text label along the edge
+                    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    text.setAttribute("class", "link-label");
+                    text.setAttribute("x", (s.x + t.x) / 2);
+                    text.setAttribute("y", (s.y + t.y) / 2 - 4);
+                    text.textContent = link.label;
+                    svg.appendChild(text);
+                }
+            });
+
+            // Draw Nodes (circles + labels)
+            nodes.forEach(n => {
+                const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                group.setAttribute("class", `node ${n.type}`);
+                group.setAttribute("transform", `translate(${n.x}, ${n.y})`);
+
+                // Circle
+                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circle.setAttribute("r", 15);
+                
+                // Label
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("y", 30);
+                
+                // Truncate long labels
+                let displayName = n.label;
+                if (displayName.length > 18) {
+                    displayName = displayName.substring(0, 15) + '...';
+                }
+                text.textContent = displayName;
+
+                group.appendChild(circle);
+                group.appendChild(text);
+                svg.appendChild(group);
+
+                // Add basic drag behavior
+                let isDragging = false;
+                group.addEventListener('mousedown', (e) => {
+                    isDragging = true;
+                    svg.style.cursor = 'grabbing';
+                });
+                
+                svg.addEventListener('mousemove', (e) => {
+                    if (isDragging) {
+                        const rect = svg.getBoundingClientRect();
+                        n.x = e.clientX - rect.left;
+                        n.y = e.clientY - rect.top;
+                        
+                        // Redraw links and node transforms
+                        redrawElements(svg, nodes, links, nodesMap);
+                    }
+                });
+
+                window.addEventListener('mouseup', () => {
+                    if (isDragging) {
+                        isDragging = false;
+                        svg.style.cursor = 'grab';
+                    }
+                });
+            });
+        }
+
+        // Quick redraw function for dragging
+        function redrawElements(svg, nodes, links, nodesMap) {
+            const lines = svg.querySelectorAll('.link');
+            const labels = svg.querySelectorAll('.link-label');
+            const nodeGroups = svg.querySelectorAll('.node');
+
+            links.forEach((link, idx) => {
+                const s = nodesMap.get(link.source);
+                const t = nodesMap.get(link.target);
+                if (s && t && lines[idx]) {
+                    lines[idx].setAttribute("x1", s.x);
+                    lines[idx].setAttribute("y1", s.y);
+                    lines[idx].setAttribute("x2", t.x);
+                    lines[idx].setAttribute("y2", t.y);
+                    
+                    if (labels[idx]) {
+                        labels[idx].setAttribute("x", (s.x + t.x) / 2);
+                        labels[idx].setAttribute("y", (s.y + t.y) / 2 - 4);
+                    }
+                }
+            });
+
+            nodes.forEach((n, idx) => {
+                if (nodeGroups[idx]) {
+                    nodeGroups[idx].setAttribute("transform", `translate(${n.x}, ${n.y})`);
+                }
+            });
+        }
+
+        function getNodeType(label) {
+            const l = label.toLowerCase();
+            if (l.includes('founder') || l.includes('developer') || l.includes('team') || l.includes('bot')) {
+                return 'actor';
+            }
+            if (l.includes('.md') || l.includes('.txt') || l.includes('.json') || l.includes('document')) {
+                return 'document';
+            }
+            return 'concept';
+        }
+
+        // Initialize Page
+        async function init() {
+            await fetchMetrics();
+            await fetchDecisions();
+            await fetchMemory();
+        }
+
+        init();
+        
+        // Refresh every 10 seconds
+        setInterval(init, 10000);
+    </script>
+</body>
+</html>
