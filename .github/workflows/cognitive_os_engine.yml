@@ -1,0 +1,44 @@
+name: Cognitive OS Engine
+
+on:
+  push:
+    branches:
+      - master
+  schedule:
+    - cron: '0 * * * *' # Run every hour
+
+jobs:
+  run-cognition:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 50 # Need history for git sensor
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run Perception & Consolidation (Founder Trial Daemon)
+        run: |
+          python mvp/single_pass_daemon.py
+          python mvp/export_static_api.py
+
+      - name: Commit and Push Memory Graph Updates
+        run: |
+          git config --local user.email "cognitive-os@github.com"
+          git config --local user.name "Cognitive OS Daemon"
+          git add mvp/memory_db.sqlite public/api/*.json
+          # Only commit if there are changes
+          git diff --quiet && git diff --staged --quiet || git commit -m "chore: OS Memory Sync [skip ci]"
+          git push
