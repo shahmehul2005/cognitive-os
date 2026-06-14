@@ -1,11 +1,19 @@
 import os
 import sys
 
+# Reconfigure stdout/stderr to UTF-8 for Windows terminal compatibility
+if sys.platform.startswith('win'):
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+        sys.stderr.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
+
 sys.path.append(os.path.dirname(__file__))
 
 from git_sensor import GitSensor
 from attention_engine import AttentionEngine
-from memory_engine import Remember, setup_database
+from memory_engine import setup_database
 from consolidation_daemon import ConsolidationDaemon
 
 def run_single_pass():
@@ -28,12 +36,20 @@ def run_single_pass():
         score = attention.process(event)
         
         if "ShouldRemember" in score.routes or "ShouldReason" in score.routes:
-            # We use the commit hash as part of the payload to prevent TMS duplicates if we wanted
-            Remember(
-                content={"text": event.payload, "verbs": event.structural_verbs, "entities": event.entities, "hash": event.id},
-                type="EPISODIC",
+            from memory_engine import BeliefStore
+            # Generate a unique subject/predicate for commits if not extracted
+            import time
+            BeliefStore.insert_belief(
+                belief_id=f"ep_{event.id}",
+                subject="git_commit",
+                predicate="contains",
+                object_val=event.id,
+                payload=event.payload,
                 confidence=0.8,
-                provenance=event.source
+                decay_rate=0.07,
+                timestamp=time.time(),
+                status="ACTIVE",
+                author_id=event.source
             )
             
     print("[Consolidation] Triggering sleep cycle...")
