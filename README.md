@@ -4,106 +4,70 @@ For fifty years, software has modeled the organization as a **filing cabinet** (
 
 **Cognitive OS proposes a radical paradigm shift: An organization is a biological cognitive organism.**
 
-Its intelligence does not live in static text; it emerges dynamically from the continuous, recurrent interaction of its cognitive faculties—Perception, Attention, Memory, Identity, Reasoning, and Learning. 
-
-When we build software for an organization, we are not building a workspace. We are engineering the organism's central nervous system.
+Its intelligence does not live in static text; it emerges dynamically from the continuous, recurrent interaction of its cognitive faculties. When we build software for an organization, we are not building a workspace. We are engineering the organism's central nervous system.
 
 ---
 
-## 🎯 The Core Thesis & Collective Intelligence
+## 🎯 What is Cognitive OS?
 
-**Collective Intelligence** is the emergent cognitive capacity of a network of human and artificial agents. It occurs when the network operates with a shared memory, attention, and reasoning model that surpasses the isolated limits of its members.
+Cognitive OS is an entirely new abstraction for collective intelligence. It replaces passive storage with active computational cognition.
 
-Without this shared central nervous system, organizations suffer from severe clinical **Cognitive Pathologies**:
+Without a shared central nervous system, organizations suffer from severe clinical **Cognitive Pathologies**:
 1. **Perceptual Blindness**: Missing critical strategic signals in a sea of noise.
 2. **Attention Deficit**: Exhausting resources by overreacting to low-utility events.
 3. **Organizational Amnesia**: Forgetting past decisions, leading to circular debates.
 4. **Identity Drift**: Executing plans that violate the organization's core values or risk appetite.
-5. **Confirmation Bias**: Clinging to outdated strategies by rejecting contradictory evidence.
 
 Cognitive OS treats these pathologies mathematically, replacing human cognitive bottlenecks with computational scaling.
 
 ---
 
-## 🧠 The Cognitive Cycle
+## 🧠 The Working Parts (The Belief Graph)
 
-In standard architectures, data flows in a linear pipeline. In Cognitive OS, cognition is a **Recurrent Cycle**. Every module continuously feeds back into the others:
+In Cognitive OS, there are no disjointed primitives like "facts," "goals," or "tasks." Everything is unified into a single atomic structure: **The Belief**. Cognition is a set of formal mathematical operations executed over a central **Belief Graph**:
 
-```
-                     Collective Memory (03)
-                     
-                     ↗                   \
-                    /                     ▼
-       Attention (05) ◄─── Reasoning (08) ───► Identity (04)
-       
-             ▲                  │                  │
-             │                  │                  ▼
-       Perception (02) ◄── Prediction (09)     Planning (09)
-                                                   │
-                                                   ▼
-                                               Action (10)
-                                                   │
-                                                   ▼
-                                             Learning &
-                                         Consolidation (06)
-```
-
-### Cognitive Faculties
-* **Perception Sensor**: Monitors environmental signals (e.g., git commits, market data, customer support tickets).
-* **Attention Filter**: The moat. Prunes 99% of noise, allocating finite compute to high-utility signals.
-* **Understanding Engine**: Translates natural human language into formal ontology and resolves ambiguous coreferences.
-* **Reasoning Engine (TMS)**: The recurrent processor. A Truth Maintenance System that evaluates the validity of beliefs, explicitly tracking confidence, sources, and contradictions.
-* **Identity Constraint**: The boundary definition. Filters out any simulated plan that violates the organism's mission, values, or risk thresholds.
-* **Memory Store**: Not a database, but a reconstructive ecosystem of Episodic, Semantic, Decision, and Procedural memories.
-* **Learning & Forgetting Loop**: An evolutionary requirement. Consolidates successes and intentionally forgets the trivial to prevent cognitive saturation.
+* **Perception Sensor**: Monitors live environmental signals and translates them into candidate semantic triples (Subject, Predicate, Object).
+* **Attention Engine (Selection)**: The gatekeeper. It scores incoming candidate beliefs based on Urgency, Structural NLP density, and Source Authority. Only high-scoring candidates are mathematically permitted to attempt graph insertion.
+* **Reasoning Engine (Constraint Propagation)**: A brutal Truth Maintenance System. When a new belief attempts to insert itself into the graph, the Reasoning Engine detects semantic contradictions against existing beliefs. It uses a deterministic hierarchy (Confidence $\to$ Identity Violations $\to$ Role Authority) to resolve the conflict. Losing claims are structurally marked `SUPERCEDED`.
+* **Identity (The Bounding Constraint)**: The foundational root nodes of the Belief Graph. These beliefs (mission, risk appetite) have zero decay. The TMS uses them to automatically veto any incoming action or reasoning that violates the company's identity.
+* **Consolidation Daemon (Weight Calibration)**: During low-activity periods, the OS "sleeps." It formally applies exponential confidence decay to unreinforced episodic beliefs (Forgetting) while strengthening the weights of structural, recurring beliefs (Learning).
 
 ---
 
-## 📚 Theoretical Foundation
+## 🛠️ The Python Crucible (Running the MVP)
 
-Our research is formalized in the `cognitive-os-paper/` directory. Begin here:
-1. **[00_manifesto.md](file:///c:/Users/user/Desktop/mem/cognitive-os-paper/00_manifesto.md)**: The end of the filing cabinet and chat room.
-2. **[01_first_principles.md](file:///c:/Users/user/Desktop/mem/cognitive-os-paper/01_first_principles.md)**: The formal definitions of the Cognitive Cycle and Collective Intelligence.
-3. **[15_pathologies.md](file:///c:/Users/user/Desktop/mem/cognitive-os-paper/15_pathologies.md)**: The clinical diagnosis of organizational failures.
-
----
-
-## 🛠️ How to Run the Prototype
-
-While the theoretical foundation is completely independent of implementation, we provide an MVP prototype to demonstrate the math in action.
+We refused to build a shiny web dashboard before the core algorithms were proven. Instead, we built the **Python Crucible**—a suite of native Python engines that execute the brutal math of our theory.
 
 ### Prerequisites
-* Python 3.10+
-* A Gemini API key in `mvp/.env`:
-  ```env
-  GEMINI_API_KEY=your_actual_key_here
-  ```
+Ensure you have Python 3.10+ installed. No external database setups are required for the crucible tests.
 
-### 1. Verification Scenario
-Verify the reasoning engine, similarity thresholds, and consolidation loops:
+### 1. Active Perception (The Git Sensor)
+Watch the Cognitive OS read live data from your Git repository, extract structural NLP verbs, and use the Attention Engine to filter out noise.
 ```bash
-python mvp/test_scenario.py
+python mvp/test_perception.py
 ```
 
-### 2. Interactive Shell
-Enter the workspace to log events, query memories, and test coreference resolution:
+### 2. Conflict Resolution (The TMS Crucible)
+Simulate a high-stakes founder disagreement over a database migration. Watch the Reasoning Engine apply the 4-level conflict resolution algorithm and auto-resolve the dispute based on an Identity Constraint violation.
 ```bash
-python mvp/workspace_shell.py
+python mvp/test_crucible.py
 ```
 
-### 3. Visual Dashboard
-Visualize the Cognitive Organism's memory network and health metrics:
+### 3. The Sleep Phase (Consolidation)
+Trigger the 2:00 AM overnight daemon. Watch it calculate activation energy decay to intentionally "forget" a trivial Slack message, while compressing a complex debate into a highly structured `Decision` semantic node.
 ```bash
-python mvp/dashboard_server.py
+python mvp/test_sleep.py
 ```
-Open **`http://localhost:8000`** in your browser.
 
 ---
 
-## 🔬 Scientific Validation
+## 🚀 Next Steps (Phase 10: The Founder Trial)
 
-We refuse to evaluate intelligence subjectively. Does the Cognitive OS optimize reasoning? We define a formal 60-day scientific founder trial in **[14_validation_protocol.md](file:///c:/Users/user/Desktop/mem/cognitive-os-paper/14_validation_protocol.md)** to measure:
-* **Retrieval Time ($T_{\text{search}}$)**
-* **Duplicate Discussion Frequency ($I_{\text{repeat}}$)**
-* **Onboarding Velocity ($V_{\text{onboard}}$)**
-* **Contradiction Rate ($R_{\text{contradiction}}$)**
+The theoretical foundation is complete. The algorithmic core has passed the Crucible. We are now entering **Phase 10: The Founder Trial**.
+
+**The Plan:**
+1. **Silent Deployment**: We will deploy the `git_sensor.py` and `consolidation_daemon.py` as background services on a single founder's machine.
+2. **No UI**: We will not build a dashboard or calendar integration yet. 
+3. **The 60-Day Scientific Trial**: The system will run silently in the background for 60 days. We will measure if the workspace actually becomes smarter over time by tracking retrieval velocity ($T_{\text{search}}$) and the reduction of duplicate architectural debates ($I_{\text{repeat}}$).
+
+If the organization survives and scales better over the next 60 days, we have successfully created a Cognitive Organism.

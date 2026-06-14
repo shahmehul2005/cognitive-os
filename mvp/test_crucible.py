@@ -30,7 +30,7 @@ def run_crucible():
 
     # Event 2: Alice's High-Stakes Proposal
     event_alice = PerceivedEvent(
-        id="evt_02",
+        id="e2",
         source="slack",
         payload="We need to switch from Redis to Valkey. Redis licensing changes are too risky.",
         timestamp=time.time(),
@@ -39,7 +39,6 @@ def run_crucible():
     )
     score_alice = attention.process(event_alice)
     print(f"\n[Attention] Event: '{event_alice.payload}'")
-    print(f"  -> Entropy Weight: {score_alice.entropy_val}")
     print(f"  -> Score: {score_alice.total_score:.2f} | Routes: {score_alice.routes}")
 
     print("\n--- STEP 2: UNDERSTANDING & REASONING (TMS) ---")

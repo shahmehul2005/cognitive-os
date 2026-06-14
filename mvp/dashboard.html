@@ -443,17 +443,25 @@
                 }
 
                 data.forEach(item => {
-                    const content = item.content;
+                    const contentStr = item.content;
+                    let content = contentStr;
+                    try { content = JSON.parse(contentStr); } catch (e) {}
+                    
                     const timeStr = new Date(item.timestamp * 1000).toLocaleTimeString();
                     
                     const div = document.createElement('div');
                     div.className = 'decision-item';
+                    
+                    let targetState = content.target_state || "Unknown Goal";
+                    let recommendation = content.recommendation || content.text || contentStr;
+                    let options = content.simulations ? content.simulations.length : 0;
+
                     div.innerHTML = `
-                        <div class="decision-title">Goal: ${content.target_state}</div>
-                        <div class="decision-desc">Recommendation: <strong style="color: #ffffff;">${content.recommendation}</strong></div>
+                        <div class="decision-title">Goal: ${targetState}</div>
+                        <div class="decision-desc">Recommendation: <strong style="color: #ffffff;">${recommendation}</strong></div>
                         <div class="decision-stats">
                             <span>🕒 ${timeStr}</span>
-                            <span>⚡ Options: ${content.simulations.length}</span>
+                            <span>⚡ Options: ${options}</span>
                         </div>
                     `;
                     list.appendChild(div);
@@ -472,25 +480,30 @@
                 const epList = document.getElementById('episodes-list');
                 epList.innerHTML = '';
                 
-                if (data.episodes.length === 0) {
+                const episodes = data.nodes.filter(n => n.type === 'EPISODIC');
+                
+                if (episodes.length === 0) {
                     epList.innerHTML = `<p style="color: var(--text-muted); text-align: center; padding: 2rem;">No conversations recorded yet.</p>`;
                 } else {
                     // Sort descending by created_at
-                    data.episodes.sort((a, b) => b.created_at - a.created_at);
+                    episodes.sort((a, b) => b.created_at - a.created_at);
                     
-                    data.episodes.forEach(ep => {
+                    episodes.forEach(ep => {
                         const div = document.createElement('div');
                         div.className = 'log-item';
                         
-                        let text = ep.content.text || JSON.stringify(ep.content);
-                        let resolved = ep.content.resolved_text;
+                        let parsedContent = ep.content;
+                        try { parsedContent = JSON.parse(ep.content); } catch (e) {}
+                        
+                        let text = parsedContent.text || ep.content;
+                        let resolved = parsedContent.resolved_text;
                         
                         let badges = '';
-                        if (ep.content.intent) {
-                            badges += `<span class="badge badge-intent">${ep.content.intent}</span>`;
+                        if (parsedContent.intent) {
+                            badges += `<span class="badge badge-intent">${parsedContent.intent}</span>`;
                         }
-                        if (ep.content.sentiment) {
-                            badges += `<span class="badge badge-sentiment">${ep.content.sentiment}</span>`;
+                        if (parsedContent.sentiment) {
+                            badges += `<span class="badge badge-sentiment">${parsedContent.sentiment}</span>`;
                         }
                         badges += `<span class="badge badge-confidence">conf: ${(ep.confidence * 100).toFixed(0)}%</span>`;
 
@@ -507,18 +520,18 @@
                 }
                 
                 // Draw Network Graph
-                renderGraph(data.semantics);
+                renderGraph(data.nodes, data.edges);
             } catch (e) {
                 console.error("Error fetching memory graph", e);
             }
         }
 
         // Custom Force-Directed Layout for SVG
-        function renderGraph(triples) {
+        function renderGraph(nodesData, edgesData) {
             const svg = document.getElementById('network-graph');
             svg.innerHTML = ''; // Clear SVG
             
-            if (triples.length === 0) {
+            if (nodesData.length === 0) {
                 const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
                 text.setAttribute("x", "50%");
                 text.setAttribute("y", "50%");
@@ -533,23 +546,25 @@
             const nodesMap = new Map();
             const links = [];
 
-            triples.forEach(t => {
-                const s = t.subject;
-                const o = t.object;
-                const p = t.predicate;
-
-                if (!nodesMap.has(s)) {
-                    nodesMap.set(s, { id: s, label: s, type: getNodeType(s) });
+            nodesData.forEach(n => {
+                let label = n.id;
+                try {
+                    let c = JSON.parse(n.content);
+                    label = c.text || c.name || c.subject || n.id;
+                } catch(e) {
+                    label = n.content.substring(0, 30) || n.id;
                 }
-                if (!nodesMap.has(o)) {
-                    nodesMap.set(o, { id: o, label: o, type: getNodeType(o) });
-                }
+                nodesMap.set(n.id, { id: n.id, label: label, type: n.type.toLowerCase() });
+            });
 
-                links.push({
-                    source: s,
-                    target: o,
-                    label: p
-                });
+            edgesData.forEach(e => {
+                if (nodesMap.has(e.source) && nodesMap.has(e.target)) {
+                    links.push({
+                        source: e.source,
+                        target: e.target,
+                        label: e.relation_type
+                    });
+                }
             });
 
             const nodes = Array.from(nodesMap.values());

@@ -8,7 +8,7 @@ import sys
 sys.path.append(os.path.dirname(__file__))
 from memory_engine import get_connection
 
-PORT = 8000
+PORT = int(os.environ.get("PORT", 8000))
 
 class DashboardHandler(http.server.BaseHTTPRequestHandler):
     def log_message(self, format, *args):
@@ -32,44 +32,38 @@ class DashboardHandler(http.server.BaseHTTPRequestHandler):
             conn = get_connection()
             cursor = conn.cursor()
             
-            # Fetch semantic memories
-            cursor.execute("SELECT memory_id, subject, predicate, object, confidence, provenance, created_at, access_count FROM semantic")
-            semantics = []
+            # Fetch all active beliefs
+            cursor.execute("SELECT id, content, confidence, type, status, provenance, created_at, access_count FROM beliefs WHERE status != 'FORGOTTEN'")
+            beliefs = []
             for row in cursor.fetchall():
-                semantics.append({
+                beliefs.append({
                     "id": row[0],
-                    "subject": row[1],
-                    "predicate": row[2],
-                    "object": row[3],
-                    "confidence": row[4],
+                    "content": row[1],
+                    "confidence": row[2],
+                    "type": row[3],
+                    "status": row[4],
                     "provenance": row[5],
                     "created_at": row[6],
                     "access_count": row[7]
                 })
                 
-            # Fetch episodic memories
-            cursor.execute("SELECT memory_id, content, confidence, provenance, created_at, access_count, consolidated FROM episodic")
-            episodes = []
+            # Fetch all edges
+            cursor.execute("SELECT source_id, target_id, relation_type, weight, created_at FROM edges")
+            edges = []
             for row in cursor.fetchall():
-                try:
-                    content = json.loads(row[1])
-                except Exception:
-                    content = row[1]
-                episodes.append({
-                    "id": row[0],
-                    "content": content,
-                    "confidence": row[2],
-                    "provenance": row[3],
-                    "created_at": row[4],
-                    "access_count": row[5],
-                    "consolidated": row[6]
+                edges.append({
+                    "source": row[0],
+                    "target": row[1],
+                    "relation_type": row[2],
+                    "weight": row[3],
+                    "created_at": row[4]
                 })
                 
             conn.close()
             
             self.wfile.write(json.dumps({
-                "semantics": semantics,
-                "episodes": episodes
+                "nodes": beliefs,
+                "edges": edges
             }).encode("utf-8"))
             
         elif self.path == "/api/decisions":
@@ -79,16 +73,12 @@ class DashboardHandler(http.server.BaseHTTPRequestHandler):
             
             conn = get_connection()
             cursor = conn.cursor()
-            cursor.execute("SELECT decision_id, content, timestamp FROM decision ORDER BY timestamp DESC")
+            cursor.execute("SELECT id, content, created_at FROM beliefs WHERE type = 'DECISION' ORDER BY created_at DESC")
             decisions = []
             for row in cursor.fetchall():
-                try:
-                    content = json.loads(row[1])
-                except Exception:
-                    content = row[1]
                 decisions.append({
                     "id": row[0],
-                    "content": content,
+                    "content": row[1],
                     "timestamp": row[2]
                 })
             conn.close()
@@ -103,17 +93,15 @@ class DashboardHandler(http.server.BaseHTTPRequestHandler):
             conn = get_connection()
             cursor = conn.cursor()
             
-            cursor.execute("SELECT COUNT(*) FROM semantic")
-            semantic_count = cursor.fetchone()[0]
+            cursor.execute("SELECT type, COUNT(*) FROM beliefs GROUP BY type")
+            counts = {row[0]: row[1] for row in cursor.fetchall()}
             
-            cursor.execute("SELECT COUNT(*) FROM episodic")
-            episodic_count = cursor.fetchone()[0]
+            semantic_count = counts.get('SEMANTIC', 0)
+            episodic_count = counts.get('EPISODIC', 0)
+            decision_count = counts.get('DECISION', 0)
             
-            cursor.execute("SELECT COUNT(*) FROM decision")
-            decision_count = cursor.fetchone()[0]
-            
-            cursor.execute("SELECT COUNT(*) FROM audit_log")
-            audit_count = cursor.fetchone()[0]
+            cursor.execute("SELECT COUNT(*) FROM edges")
+            edge_count = cursor.fetchone()[0]
             
             conn.close()
             
@@ -126,7 +114,7 @@ class DashboardHandler(http.server.BaseHTTPRequestHandler):
                 "semantic_count": semantic_count,
                 "episodic_count": episodic_count,
                 "decision_count": decision_count,
-                "audit_count": audit_count,
+                "audit_count": edge_count, # repurpose to edge count
                 "compression_ratio": round(compression_ratio, 2)
             }).encode("utf-8"))
             

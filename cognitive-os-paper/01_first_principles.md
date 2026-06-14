@@ -1,77 +1,60 @@
 # Stage 1: First Principles of the Cognitive Organism
 
-This document establishes the formal theoretical foundation for the Cognitive Operating System (Cognitive OS). We depart entirely from the "workspace" or "chat interface" models of human-AI interaction. Instead, we model the organization as a biological **Cognitive Organism**.
+This document establishes the formal theoretical foundation for the Cognitive Operating System (Cognitive OS). We depart entirely from the "workspace" or "chat interface" models of human-AI interaction. Instead, we model the organization as a biological **Cognitive Organism** driven by a mathematically formalizable belief system.
 
 Until these core concepts are precisely defined, any downstream architecture or implementation details will remain ambiguous. 
 
 ---
 
-## 1. The Cognitive Organism Hypothesis
+## 1. The Atomic Unit: The Belief
 
-### 1.1 The Thesis
-An organization is a living, cognitive entity. Its intelligence does not reside in documents, databases, or chat rooms. Its intelligence emerges dynamically from the real-time interaction of **Perception, Attention, Memory, Identity, Reasoning, and Learning**. 
+Physics has atoms. Computer science has bits. Neural networks have activations. 
 
-When we build software for an organization, we are not building a filing cabinet. We are engineering the organism's central nervous system.
+The Cognitive OS has **Beliefs**.
 
-### 1.2 The Cognitive Cycle
-In standard software architectures, data flows in a linear pipeline (Input $\to$ Process $\to$ Output). In a Cognitive Organism, cognition is a **Recurrent Cycle**. Every module continuously feeds back into the others.
+We explicitly reject the use of disparate, overlapping primitives (memories, facts, events, goals, ideas, risks, tasks, decisions). These are all simply contextual variations of a single underlying computational structure.
 
-- **Perception** receives signals, but what it perceives is filtered by **Attention**.
-- **Attention** ranks information, but its priorities are dictated by **Identity** and past **Memory**.
-- **Reasoning** evaluates truth and simulates futures, but its models are updated by continuous **Learning**.
+A **Belief** is a formalized semantic claim about the world, maintaining:
+- A structural proposition (e.g., Subject, Predicate, Object).
+- A **Confidence Weight** ($0.0 \to 1.0$) denoting the organism's certainty.
+- A **Decay Function** that governs how the belief erodes over time without reinforcement.
+- **Provenance** (who or what asserted it, and when).
 
----
-
-## 2. Intelligence
-
-### 2.1 Formal Definition
-**Intelligence** is the capacity of a cognitive organism to model its environment, minimize uncertainty (free energy), and steer future states toward homeostatic or goal-aligned configurations under computational and physical constraints.
-
-### 2.2 Cybernetic Framing
-In active inference terms, intelligence is not a static score but a dynamic process. It minimizes variational free energy (the divergence between its mental model and reality) while maximizing utility aligned with its Identity.
-$$\mathcal{I} = -\int_{t} D_{KL} \left( q(\theta) \,\|\, p(\theta \mid y) \right) dt + \mathbb{E}_{q(\theta)} \left[ \mathcal{U}(a) \right]$$
+By reducing the entire system to Beliefs, the architecture transitions from a software application into a unified cognitive engine.
 
 ---
 
-## 3. Collective Intelligence
+## 2. The Three Laws of Organizational Cognition
 
-### 3.1 Formal Definition
-**Collective Intelligence** is the emergent cognitive capacity of a heterogeneous network of human and artificial agents. It occurs when the network operates with a shared memory, attention, and reasoning model that surpasses the isolated cognitive limits of its constituent members.
+1. **Intelligence emerges from continual belief revision under constrained attention.**
+   The organism does not "store data"; it updates its internal model of reality. Attention is the scarce computational resource that determines *which* beliefs are evaluated and updated.
 
-### 3.2 System & Network Framing
-Collective intelligence can be modeled as a directed graph $\mathcal{G} = (\mathcal{V}, \mathcal{E}, \mathcal{W})$ where:
-- $\mathcal{V}$ represents the vertices (human agents $h_i$ and artificial agents $a_j$).
-- $\mathcal{E}$ represents the communication channels and shared context boundaries.
-- $\mathcal{W}$ represents the weights (bandwidth, trust, latency, semantic alignment).
+2. **Memory exists to optimize future decisions rather than preserve the past.**
+   Retention is expensive. The organism aggressively forgets trivial beliefs (via exponential decay) and consolidates patterns into durable abstractions, ensuring that retrieval serves execution, not archiving.
 
-The capacity of collective intelligence $\mathcal{C}(\mathcal{G})$ is:
-$$\mathcal{C}(\mathcal{G}) = f\left(\sum_{(i,j) \in \mathcal{E}} w_{ij} \cdot \text{Alignment}(i, j) \right) - \text{Coordination Overhead}(\mathcal{G})$$
-
-A system achieves Collective Intelligence when it systematically minimizes coordination overhead while maximizing semantic bandwidth between nodes via a shared cognitive cycle.
+3. **Collective intelligence grows as shared belief coherence increases while coordination cost decreases.**
+   An organization becomes highly intelligent when its constituent agents (human and AI) share a mathematically coherent, non-contradictory Belief Graph that eliminates the friction of redundant communication.
 
 ---
 
-## 4. The Core Modules
+## 3. The Cognitive Modules as Belief Graph Operations
 
-If the organization is an organism, these are its cognitive faculties.
+If the organization is an organism, and its atomic unit is the Belief, the core cognitive modules are no longer disconnected software features. They are unified mathematical operations on a central **Belief Graph**.
 
-### 4.1 Attention (The Moat)
-**Attention** is the intentional allocation of finite cognitive and computational resources to highest-utility signals. In an era of infinite data, intelligence is not remembering everything; it is knowing what to ignore. Attention acts as the gating function that prunes 99% of noise, allowing the organism to focus on strategic execution.
+### 3.1 Attention (Selection)
+Attention is the **selection function**. It scores incoming signals to determine which external data warrants the computational cost of attempting to update the Belief Graph. 
 
-### 4.2 Memory (The Reconstructive Foundation)
-**Memory** is not a static database read/write operation. It is the dynamic, active, and reconstructive preservation of information over time. It is a lossy, confidence-aware compression function:
-$$\text{Memory} = \text{Compress}(S_t, A_t, O_{t+1}) \to M_t$$
-Retrieval is always biased by the organism's current context. The organism remembers not just *what* happened, but *why* it happened (Decision Memory) and *how* to do it (Procedural Memory).
+### 3.2 Memory (Persistence)
+Memory is the **persistence layer** of weighted beliefs. It is a lossy, confidence-aware compression function. It does not blindly store text; it stores the evolving state of the Belief Graph over time.
 
-### 4.3 Identity (The Boundary Constraint)
-**Identity** is the set of invariant principles, mission parameters, values, and risk profiles that defines the boundaries of the organism. It acts as a global constraint on reasoning and planning. If a simulated action violates a core identity constraint (e.g., exceeding risk appetite), the utility of that action drops to zero. Identity ensures the organism acts with coherent purpose.
+### 3.3 Reasoning (Constraint Propagation)
+Reasoning is the **Truth Maintenance System**. It is the continuous manipulation of internal representations to propagate constraints across the Belief Graph. It detects contradictions (e.g., Belief A contradicts Belief B) and forces conflict resolution based on confidence and authority.
 
-### 4.4 Reasoning (The Truth Maintenance System)
-**Reasoning** is the continuous manipulation of internal representations to infer latent parameters, evaluate assumptions, and resolve contradictions. It is the runtime that evaluates the truthfulness of new signals against the organism's existing knowledge graph, explicitly tracking confidence, sources, and uncertainty.
+### 3.4 Learning & Forgetting (Weight Calibration)
+Learning is the **weight calibration function**. It adjusts the confidence of beliefs based on predictive accuracy. Forgetting is the intentional decay function, reducing the confidence of unreferenced episodic beliefs to clear cognitive bandwidth.
 
-### 4.5 Planning & Action (The Execution Branch)
-**Planning** is the generation of simulated futures. It models multi-step trajectories to transition the organism from its current state to a target state aligned with its Identity. **Action** is the physical execution of those plans in the environment.
+### 3.5 Identity (The Bounding Constraint)
+Identity is the set of **invariant core beliefs**. These beliefs have a decay rate approaching zero. They act as the ultimate boundary constraints on the Belief Graph, vetoing any new reasoning or planning that contradicts the organism's core nature.
 
-### 4.6 Learning & Forgetting (The Adaptation Loop)
-**Learning** is the continuous update of the organism's parameters based on the difference between expected predictions and observed reality. 
-**Forgetting** is an entropy-maximizing utility function. It is the intentional decay of trivial information to prevent cognitive saturation and preserve retrieval precision. Forgetting is not a flaw; it is an evolutionary requirement for intelligence.
+### 3.6 Planning (Future Projection)
+Planning is the **generation of future belief trajectories**. It simulates potential actions and evaluates how those actions will shift the state of the Belief Graph toward homeostatic or goal-aligned configurations.
