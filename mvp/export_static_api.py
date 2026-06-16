@@ -67,7 +67,7 @@ def export_api():
             "target": row[1],
             "relation_type": row[2],
             "weight": 1.0,
-            "created_at": time.time()
+            "created_at": 1781500000.0 # Static fallback since edges don't have timestamps
         })
         
     with open(os.path.join(public_api_dir, "memory.json"), "w", encoding="utf-8") as f:

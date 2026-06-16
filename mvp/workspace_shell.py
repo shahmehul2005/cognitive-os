@@ -14,7 +14,7 @@ if sys.platform.startswith('win'):
 # Ensure local imports work
 sys.path.append(os.path.dirname(__file__))
 
-from memory_engine import setup_database, Remember, Retrieve, get_connection
+from memory_engine import setup_database, get_connection
 from decision_engine import Plan
 from consolidation_daemon import Consolidate
 from understanding_engine import Understand
@@ -118,25 +118,37 @@ def run_shell():
                 "sentiment": model["sentiment"],
                 "resolved_entities": model["resolved_entities"]
             }
-            event_id = Remember(payload, "Episodic", 0.95, "cli_session")
+            from memory_engine import BeliefStore
+            import time
+            event_id = f"ep_{int(time.time())}"
+            BeliefStore.insert_belief(
+                belief_id=event_id,
+                subject="chat_log",
+                predicate="contains",
+                object_val=model["intent"],
+                payload=json.dumps(payload),
+                confidence=0.95,
+                decay_rate=0.07,
+                timestamp=time.time(),
+                status="ACTIVE",
+                author_id="cli_session"
+            )
             print(f"✔️ Conversation recorded to Episodic store (ID: {event_id})")
         elif user_input.startswith("/query "):
             query = user_input[7:].strip()
             print(f"🔎 Scanning semantic memory graphs for '{query}'...")
-            
-            # Retrieve from semantic facts
-            retrieved = Retrieve(query, filters={"type": "Semantic"}, k=3, min_activation_energy=0.01)
+            conn = get_connection()
+            cursor = conn.cursor()
+            cursor.execute("SELECT id, payload, object FROM beliefs WHERE payload LIKE ? OR object LIKE ? LIMIT 5", (f"%{query}%", f"%{query}%"))
+            retrieved = cursor.fetchall()
+            conn.close()
             
             if not retrieved:
-                print("No matching semantic nodes found. Querying raw episodic memories...")
-                retrieved = Retrieve(query, filters={"type": "Episodic"}, k=3, min_activation_energy=0.01)
-                
-            if not retrieved:
-                print("❌ No matching memories found above activation energy bounds.")
+                print("❌ No matching memories found.")
             else:
                 print(f"Found {len(retrieved)} matches:")
-                for node, energy in retrieved:
-                    print(f"  - [{node['memory_id'][:8]}] Content: {node['content']} (Energy: {energy:.4f})")
+                for row in retrieved:
+                    print(f"  - [{row[0][:8]}] Content: {row[1] or row[2]}")
         elif user_input.startswith("/plan "):
             goal_id = user_input[6:].strip()
             # Find goal in identity file
