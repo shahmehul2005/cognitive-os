@@ -3,215 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cognitive OS - Workspace Dashboard</title>
+    <title>Cognitive OS - The Brain</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     
+    <!-- D3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
     <style>
         :root {
-            --bg-gradient: linear-gradient(135deg, #070a13 0%, #0c0f1d 50%, #11142a 100%);
-            --card-bg: rgba(18, 22, 41, 0.7);
-            --border-color: rgba(99, 102, 241, 0.15);
-            --border-glow: rgba(99, 102, 241, 0.4);
-            --cyan: #06b6d4;
-            --violet: #8b5cf6;
-            --rose: #f43f5e;
-            --emerald: #10b981;
-            --text-main: #f1f5f9;
-            --text-muted: #94a3b8;
+            --bg-base: #050505;
+            --panel-bg: rgba(15, 15, 17, 0.6);
+            --border-glow: rgba(99, 102, 241, 0.2);
+            --cyan: #00f0ff;
+            --violet: #b53cff;
+            --rose: #ff2a6d;
+            --emerald: #05d59e;
+            --text-main: #f8fafc;
+            --text-muted: #8b949e;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            user-select: none;
         }
 
         body {
             font-family: 'Outfit', sans-serif;
-            background: var(--bg-gradient);
+            background-color: var(--bg-base);
             color: var(--text-main);
-            min-height: 100vh;
-            padding: 2rem;
-            overflow-x: hidden;
-        }
-
-        /* Glassmorphism containers */
-        .glass-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .glass-card:hover {
-            border-color: rgba(99, 102, 241, 0.3);
-            box-shadow: 0 12px 40px 0 rgba(99, 102, 241, 0.15);
-        }
-
-        /* Layout */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding: 1.5rem;
-        }
-
-        .header h1 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 700;
-            font-size: 2.2rem;
-            background: linear-gradient(to right, #ffffff, var(--cyan), var(--violet));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -0.5px;
-        }
-
-        .status-badge {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            padding: 6px 12px;
-            border-radius: 30px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--emerald);
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background-color: var(--emerald);
-            border-radius: 50%;
-            animation: pulse 1.8s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(0.9); opacity: 0.6; }
-            50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 10px var(--emerald); }
-            100% { transform: scale(0.9); opacity: 0.6; }
-        }
-
-        /* Scorecard */
-        .scorecard-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .metric-card {
-            padding: 1.5rem;
-            text-align: center;
-            position: relative;
+            height: 100vh;
             overflow: hidden;
+            display: flex;
         }
 
-        .metric-card::before {
-            content: '';
+        /* Full Screen Graph Canvas */
+        #graph-container {
             position: absolute;
             top: 0;
             left: 0;
-            width: 4px;
-            height: 100%;
-            background: var(--violet);
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+            background: radial-gradient(circle at 50% 50%, #111116 0%, var(--bg-base) 100%);
         }
 
-        .metric-card.cyan::before { background: var(--cyan); }
-        .metric-card.rose::before { background: var(--rose); }
-        .metric-card.emerald::before { background: var(--emerald); }
-
-        .metric-value {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.25rem;
-            color: #ffffff;
+        /* Glass Panels */
+        .glass-panel {
+            position: relative;
+            z-index: 10;
+            background: var(--panel-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), inset 0 0 0 1px var(--border-glow);
+            display: flex;
+            flex-direction: column;
         }
 
-        .metric-label {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* Main Dashboard Grid */
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1.6fr 1fr;
+        /* Sidebar - Cognitive Health */
+        #sidebar-left {
+            position: absolute;
+            left: 2rem;
+            top: 2rem;
+            bottom: 2rem;
+            width: 360px;
+            padding: 2rem;
+            display: flex;
             gap: 2rem;
-            margin-bottom: 2rem;
         }
 
-        @media (max-width: 1024px) {
-            .main-grid {
-                grid-template-columns: 1fr;
-            }
+        /* Sidebar - Logs */
+        #sidebar-right {
+            position: absolute;
+            right: 2rem;
+            top: 2rem;
+            bottom: 2rem;
+            width: 400px;
+            padding: 1.5rem;
+            gap: 1.5rem;
         }
 
-        .section-title {
+        /* Typography */
+        h1 {
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.3rem;
+            font-weight: 700;
+            font-size: 2rem;
+            background: linear-gradient(135deg, #ffffff 0%, var(--cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem;
             font-weight: 600;
-            margin-bottom: 1.25rem;
+            color: var(--text-main);
+            margin-bottom: 1rem;
             display: flex;
             align-items: center;
-            gap: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            padding-bottom: 0.75rem;
+            gap: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 0.5rem;
         }
 
-        /* Graph visualization */
-        .graph-card {
-            padding: 1.5rem;
-            height: 550px;
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+
+        /* Metrics */
+        .metric-group {
             display: flex;
             flex-direction: column;
+            gap: 1.5rem;
         }
 
-        .graph-container {
-            flex-grow: 1;
-            background: rgba(8, 10, 20, 0.6);
+        .metric-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            padding: 1rem;
+            background: rgba(0,0,0,0.2);
             border-radius: 12px;
-            position: relative;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-left: 2px solid var(--violet);
+            transition: all 0.3s ease;
         }
 
-        svg#network-graph {
-            width: 100%;
-            height: 100%;
-            cursor: grab;
+        .metric-item:hover {
+            background: rgba(255,255,255,0.03);
+            border-left-color: var(--cyan);
+            transform: translateX(5px);
         }
 
-        svg#network-graph:active {
-            cursor: grabbing;
+        .metric-item.cyan { border-left-color: var(--cyan); }
+        .metric-item.emerald { border-left-color: var(--emerald); }
+
+        .metric-val {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #fff;
         }
 
-        /* Details & Logs */
-        .details-column {
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
+        .metric-lbl {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
         }
 
-        .log-card {
-            padding: 1.5rem;
-            height: 260px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .log-list {
+        /* Logs Lists */
+        .log-container {
             flex-grow: 1;
             overflow-y: auto;
             display: flex;
@@ -220,559 +172,440 @@
             padding-right: 0.5rem;
         }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(99, 102, 241, 0.25);
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(99, 102, 241, 0.5);
-        }
-
         .log-item {
             background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            padding: 10px 14px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            line-height: 1.4;
-            transition: background 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 1rem;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .log-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 2px;
+            height: 100%;
+            background: var(--violet);
+            opacity: 0;
+            transition: opacity 0.2s ease;
         }
 
         .log-item:hover {
-            background: rgba(99, 102, 241, 0.05);
-            border-color: rgba(99, 102, 241, 0.15);
+            background: rgba(255, 255, 255, 0.04);
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .log-item:hover::before {
+            opacity: 1;
+        }
+
+        .log-text {
+            font-size: 0.95rem;
+            color: #e2e8f0;
+            line-height: 1.4;
+            margin-bottom: 0.5rem;
+        }
+
+        .log-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Badges */
+        .badges {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
         }
 
         .badge {
-            display: inline-block;
-            font-size: 0.7rem;
-            font-weight: 700;
-            padding: 2px 6px;
+            padding: 0.2rem 0.5rem;
             border-radius: 4px;
-            text-transform: uppercase;
-            margin-right: 6px;
-        }
-
-        .badge-intent { background: rgba(6, 182, 212, 0.15); color: var(--cyan); border: 1px solid rgba(6, 182, 212, 0.3); }
-        .badge-sentiment { background: rgba(139, 92, 246, 0.15); color: var(--violet); border: 1px solid rgba(139, 92, 246, 0.3); }
-        .badge-confidence { background: rgba(16, 185, 129, 0.15); color: var(--emerald); border: 1px solid rgba(16, 185, 129, 0.3); }
-
-        .decision-card {
-            padding: 1.5rem;
-            height: 260px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .decision-item {
-            background: rgba(99, 102, 241, 0.03);
-            border-left: 3px solid var(--violet);
-            padding: 10px 14px;
-            border-radius: 0 8px 8px 0;
-            font-size: 0.9rem;
-            margin-bottom: 0.75rem;
-        }
-
-        .decision-title {
+            font-size: 0.7rem;
             font-weight: 600;
-            margin-bottom: 4px;
-            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .decision-desc {
-            color: var(--text-muted);
-            margin-bottom: 6px;
-            font-size: 0.85rem;
-        }
+        .badge.intent { background: rgba(0, 240, 255, 0.1); color: var(--cyan); }
+        .badge.sentiment { background: rgba(181, 60, 255, 0.1); color: var(--violet); }
+        .badge.decision { background: rgba(255, 42, 109, 0.1); color: var(--rose); }
 
-        .decision-stats {
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+
+        /* Live Status Indicator */
+        .live-status {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
             display: flex;
-            gap: 12px;
-            font-size: 0.8rem;
-            color: var(--cyan);
+            align-items: center;
+            gap: 8px;
+            z-index: 20;
+            background: rgba(0,0,0,0.5);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            border: 1px solid rgba(5, 213, 158, 0.3);
+            color: var(--emerald);
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
-        /* SVG styles */
-        .node circle {
-            fill: #1e293b;
-            stroke: var(--cyan);
-            stroke-width: 2.5px;
-            cursor: pointer;
-            transition: filter 0.2s, stroke-width 0.2s;
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--emerald);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--emerald);
+            animation: pulse 2s infinite;
         }
 
-        .node:hover circle {
-            filter: drop-shadow(0 0 8px var(--cyan));
-            stroke-width: 4px;
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.5; }
         }
 
-        .node.actor circle {
-            stroke: var(--violet);
-        }
-
-        .node.document circle {
-            stroke: var(--rose);
-        }
-
-        .node text {
-            fill: var(--text-main);
-            font-size: 11px;
-            font-family: 'Outfit', sans-serif;
+        /* SVG Tooltip */
+        #tooltip {
+            position: absolute;
+            opacity: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
             pointer-events: none;
-            text-anchor: middle;
-        }
-
-        .link {
-            stroke: rgba(255, 255, 255, 0.08);
-            stroke-width: 1.5px;
-            fill: none;
-        }
-
-        .link-label {
-            fill: var(--text-muted);
-            font-size: 9px;
-            text-anchor: middle;
-            pointer-events: none;
-            background: #000;
+            font-size: 0.85rem;
+            z-index: 50;
+            transition: opacity 0.2s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
     </style>
 </head>
 <body>
 
-    <!-- Header -->
-    <div class="glass-card header">
+    <!-- Background Graph Canvas -->
+    <div id="graph-container"></div>
+    <div id="tooltip"></div>
+
+    <!-- Live Status Indicator -->
+    <div class="live-status">
+        <div class="pulse-dot"></div>
+        System Active
+    </div>
+
+    <!-- Left Sidebar: Cognitive Health & Identity -->
+    <div id="sidebar-left" class="glass-panel">
         <div>
-            <h1>Cognitive Operating System</h1>
-            <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 4px;">Collective Intelligence Dashboard</p>
+            <h1>Cognitive OS</h1>
+            <div class="subtitle">Autonomous Organizational Memory</div>
         </div>
-        <div class="status-badge">
-            <div class="status-dot"></div>
-            <span>Connected</span>
+
+        <div style="flex-grow: 1;">
+            <h3>📊 Cognitive Health</h3>
+            <div class="metric-group">
+                <div class="metric-item">
+                    <span class="metric-val" id="val-semantic">0</span>
+                    <span class="metric-lbl">Abstracted Semantic Facts</span>
+                </div>
+                <div class="metric-item cyan">
+                    <span class="metric-val" id="val-episodic">0</span>
+                    <span class="metric-lbl">Raw Episodic Logs</span>
+                </div>
+                <div class="metric-item emerald">
+                    <span class="metric-val" id="val-compression">0%</span>
+                    <span class="metric-lbl">Semantic Compression Ratio</span>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: auto; font-size: 0.75rem; color: var(--text-muted); text-align: center;">
+            Kernel v1.0.0 • Connected
         </div>
     </div>
 
-    <!-- Scorecard -->
-    <div class="scorecard-row">
-        <div class="glass-card metric-card cyan">
-            <div class="metric-value" id="count-semantics">-</div>
-            <div class="metric-label">Semantic Facts</div>
-        </div>
-        <div class="glass-card metric-card">
-            <div class="metric-value" id="count-episodes">-</div>
-            <div class="metric-label">Episodic Logs</div>
-        </div>
-        <div class="glass-card metric-card rose">
-            <div class="metric-value" id="count-decisions">-</div>
-            <div class="metric-label">Decisions Logged</div>
-        </div>
-        <div class="glass-card metric-card emerald">
-            <div class="metric-value" id="compression-ratio">-</div>
-            <div class="metric-label">Compression</div>
-        </div>
-    </div>
-
-    <!-- Main Grid -->
-    <div class="main-grid">
-        <!-- Graph Area -->
-        <div class="glass-card graph-card">
-            <div class="section-title">
-                <span>🕸️</span> Active Semantic Memory Graph
-            </div>
-            <div class="graph-container">
-                <svg id="network-graph"></svg>
+    <!-- Right Sidebar: The Stream (Decisions + Episodes) -->
+    <div id="sidebar-right" class="glass-panel">
+        
+        <div style="flex: 1; display: flex; flex-direction: column; overflow: hidden; margin-bottom: 1rem;">
+            <h3>⚖️ Architectural Decisions</h3>
+            <div class="log-container" id="list-decisions">
+                <div style="text-align: center; color: var(--text-muted); margin-top: 2rem; font-size: 0.9rem;">No decisions retrieved.</div>
             </div>
         </div>
 
-        <!-- Details Column -->
-        <div class="details-column">
-            <!-- Episodic Logs -->
-            <div class="glass-card log-card">
-                <div class="section-title">
-                    <span>💬</span> Episodic Conversations
-                </div>
-                <div class="log-list" id="episodes-list">
-                    <p style="color: var(--text-muted); text-align: center; margin-top: 2rem;">Loading episodes...</p>
-                </div>
-            </div>
-
-            <!-- Decisions -->
-            <div class="glass-card decision-card">
-                <div class="section-title">
-                    <span>⚖️</span> Decision Audit Log
-                </div>
-                <div class="log-list" id="decisions-list">
-                    <p style="color: var(--text-muted); text-align: center; margin-top: 2rem;">Loading decisions...</p>
-                </div>
+        <div style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+            <h3>💬 Episodic Stream</h3>
+            <div class="log-container" id="list-episodes">
+                <div style="text-align: center; color: var(--text-muted); margin-top: 2rem; font-size: 0.9rem;">No streams recorded.</div>
             </div>
         </div>
+
     </div>
 
     <script>
-        // Fetch API Data
-        async function fetchMetrics() {
+        // API Fetching Logic
+        async function loadData() {
             try {
-                const res = await fetch('api/metrics.json');
-                const data = await res.json();
-                document.getElementById('count-semantics').innerText = data.semantic_count;
-                document.getElementById('count-episodes').innerText = data.episodic_count;
-                document.getElementById('count-decisions').innerText = data.decision_count;
-                document.getElementById('compression-ratio').innerText = Math.round(data.compression_ratio * 100) + '%';
-            } catch (e) {
-                console.error("Error fetching metrics", e);
+                const [metricsRes, decisionsRes, memoryRes] = await Promise.all([
+                    fetch('api/metrics.json'),
+                    fetch('api/decisions.json'),
+                    fetch('api/memory.json')
+                ]);
+
+                const metrics = await metricsRes.json();
+                const decisions = await decisionsRes.json();
+                const memory = await memoryRes.json();
+
+                updateMetrics(metrics);
+                updateDecisions(decisions);
+                updateEpisodes(memory.nodes);
+                renderD3Graph(memory.nodes, memory.edges);
+
+            } catch (err) {
+                console.error("Failed to fetch OS state:", err);
             }
         }
 
-        async function fetchDecisions() {
-            try {
-                const res = await fetch('api/decisions.json');
-                const data = await res.json();
-                const list = document.getElementById('decisions-list');
-                list.innerHTML = '';
-                
-                if (data.length === 0) {
-                    list.innerHTML = `<p style="color: var(--text-muted); text-align: center; padding: 2rem;">No decision trajectories logged yet.</p>`;
-                    return;
-                }
-
-                data.forEach(item => {
-                    const contentStr = item.content;
-                    let content = contentStr;
-                    try { content = JSON.parse(contentStr); } catch (e) {}
-                    
-                    const timeStr = new Date(item.timestamp * 1000).toLocaleTimeString();
-                    
-                    const div = document.createElement('div');
-                    div.className = 'decision-item';
-                    
-                    let targetState = content.target_state || "Unknown Goal";
-                    let recommendation = content.recommendation || content.text || contentStr;
-                    let options = content.simulations ? content.simulations.length : 0;
-
-                    div.innerHTML = `
-                        <div class="decision-title">Goal: ${targetState}</div>
-                        <div class="decision-desc">Recommendation: <strong style="color: #ffffff;">${recommendation}</strong></div>
-                        <div class="decision-stats">
-                            <span>🕒 ${timeStr}</span>
-                            <span>⚡ Options: ${options}</span>
-                        </div>
-                    `;
-                    list.appendChild(div);
-                });
-            } catch (e) {
-                console.error("Error fetching decisions", e);
-            }
+        function updateMetrics(data) {
+            document.getElementById('val-semantic').innerText = data.semantic_count || 0;
+            document.getElementById('val-episodic').innerText = data.episodic_count || 0;
+            document.getElementById('val-compression').innerText = Math.round((data.compression_ratio || 0) * 100) + '%';
         }
 
-        async function fetchMemory() {
-            try {
-                const res = await fetch('api/memory.json');
-                const data = await res.json();
-                
-                // Render Episodes
-                const epList = document.getElementById('episodes-list');
-                epList.innerHTML = '';
-                
-                const episodes = data.nodes.filter(n => n.type === 'EPISODIC');
-                
-                if (episodes.length === 0) {
-                    epList.innerHTML = `<p style="color: var(--text-muted); text-align: center; padding: 2rem;">No conversations recorded yet.</p>`;
-                } else {
-                    // Sort descending by created_at
-                    episodes.sort((a, b) => b.created_at - a.created_at);
-                    
-                    episodes.forEach(ep => {
-                        const div = document.createElement('div');
-                        div.className = 'log-item';
-                        
-                        let parsedContent = ep.content;
-                        try { parsedContent = JSON.parse(ep.content); } catch (e) {}
-                        
-                        let text = parsedContent.text || ep.content;
-                        let resolved = parsedContent.resolved_text;
-                        
-                        let badges = '';
-                        if (parsedContent.intent) {
-                            badges += `<span class="badge badge-intent">${parsedContent.intent}</span>`;
-                        }
-                        if (parsedContent.sentiment) {
-                            badges += `<span class="badge badge-sentiment">${parsedContent.sentiment}</span>`;
-                        }
-                        badges += `<span class="badge badge-confidence">conf: ${(ep.confidence * 100).toFixed(0)}%</span>`;
-
-                        div.innerHTML = `
-                            <div style="margin-bottom: 6px; font-weight: 500;">${text}</div>
-                            ${resolved ? `<div style="font-size: 0.85rem; color: var(--cyan); margin-bottom: 8px;">Resolved Context: "${resolved}"</div>` : ''}
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <div>${badges}</div>
-                                <span style="font-size: 0.75rem; color: var(--text-muted);">Retrievals: ${ep.access_count}</span>
-                            </div>
-                        `;
-                        epList.appendChild(div);
-                    });
-                }
-                
-                // Draw Network Graph
-                renderGraph(data.nodes, data.edges);
-            } catch (e) {
-                console.error("Error fetching memory graph", e);
-            }
-        }
-
-        // Custom Force-Directed Layout for SVG
-        function renderGraph(nodesData, edgesData) {
-            const svg = document.getElementById('network-graph');
-            svg.innerHTML = ''; // Clear SVG
+        function updateDecisions(data) {
+            const list = document.getElementById('list-decisions');
+            if (!data || data.length === 0) return;
             
-            if (nodesData.length === 0) {
-                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                text.setAttribute("x", "50%");
-                text.setAttribute("y", "50%");
-                text.setAttribute("fill", "#94a3b8");
-                text.setAttribute("text-anchor", "middle");
-                text.textContent = "Graph empty. Run sleep consolidation to build facts.";
-                svg.appendChild(text);
-                return;
-            }
+            list.innerHTML = '';
+            data.forEach(item => {
+                let content = item.content;
+                try { content = JSON.parse(item.content); } catch (e) {}
 
-            // Extract unique nodes and links
-            const nodesMap = new Map();
-            const links = [];
+                let targetState = content.target_state || "Unknown Goal";
+                let rec = content.recommendation || content.text || (typeof content === 'string' ? content : "Decision Log");
+                const timeStr = new Date(item.timestamp * 1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
-            nodesData.forEach(n => {
-                let label = n.id;
+                list.innerHTML += `
+                    <div class="log-item" style="border-left-color: var(--rose);">
+                        <div class="log-text" style="font-weight: 500;">Target: ${targetState}</div>
+                        <div class="log-text" style="color: var(--text-muted); font-size: 0.85rem;">Decision: ${rec}</div>
+                        <div class="log-meta">
+                            <span class="badge decision">DECISION</span>
+                            <span>${timeStr}</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function updateEpisodes(nodes) {
+            const list = document.getElementById('list-episodes');
+            const episodes = nodes.filter(n => n.type === 'EPISODIC').sort((a,b) => b.created_at - a.created_at);
+            
+            if (episodes.length === 0) return;
+
+            list.innerHTML = '';
+            episodes.forEach(ep => {
+                let content = ep.content;
+                try { content = JSON.parse(ep.content); } catch (e) {}
+
+                let text = content.text || (typeof content === 'string' ? content : "Unknown Log");
+                const timeStr = new Date(ep.created_at * 1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+                let badges = '';
+                if (content.intent) badges += `<span class="badge intent">${content.intent}</span>`;
+                if (content.sentiment) badges += `<span class="badge sentiment">${content.sentiment}</span>`;
+
+                list.innerHTML += `
+                    <div class="log-item">
+                        <div class="log-text">${text}</div>
+                        <div class="log-meta">
+                            <div class="badges">${badges}</div>
+                            <span>${timeStr}</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // --- D3.js Force Directed Graph ---
+        let simulation, svg, link, node, labels;
+
+        function renderD3Graph(nodesData, edgesData) {
+            const container = document.getElementById('graph-container');
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            // Clear previous SVG
+            d3.select("#graph-container").selectAll("svg").remove();
+
+            if (nodesData.length === 0) return;
+
+            // Process Nodes & Edges
+            const nodes = nodesData.map(d => {
+                let label = d.id;
                 try {
-                    let c = JSON.parse(n.content);
-                    label = c.text || c.name || c.subject || n.id;
+                    let c = JSON.parse(d.content);
+                    label = c.text || c.name || c.subject || d.id;
                 } catch(e) {
-                    label = n.content.substring(0, 30) || n.id;
+                    label = d.content.substring(0, 30) || d.id;
                 }
-                nodesMap.set(n.id, { id: n.id, label: label, type: n.type.toLowerCase() });
+                return Object.assign({}, d, {label: label});
             });
 
-            edgesData.forEach(e => {
-                if (nodesMap.has(e.source) && nodesMap.has(e.target)) {
-                    links.push({
-                        source: e.source,
-                        target: e.target,
-                        label: e.relation_type
-                    });
-                }
-            });
+            const nodeIds = new Set(nodes.map(d => d.id));
+            const links = edgesData.filter(d => nodeIds.has(d.source) && nodeIds.has(d.target))
+                                   .map(d => Object.assign({}, d));
 
-            const nodes = Array.from(nodesMap.values());
+            // Set up D3 SVG
+            svg = d3.select("#graph-container")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .call(d3.zoom().scaleExtent([0.3, 3]).on("zoom", (event) => {
+                    svgGroup.attr("transform", event.transform);
+                }));
 
-            // Simple spring force physics implementation
-            const width = svg.clientWidth || 600;
-            const height = svg.clientHeight || 500;
+            const svgGroup = svg.append("g");
 
-            // Random initialization coordinates around center
-            nodes.forEach(n => {
-                n.x = width / 2 + (Math.random() - 0.5) * 200;
-                n.y = height / 2 + (Math.random() - 0.5) * 200;
-                n.vx = 0;
-                n.vy = 0;
-            });
+            // Physics Force Simulation
+            simulation = d3.forceSimulation(nodes)
+                .force("link", d3.forceLink(links).id(d => d.id).distance(150))
+                .force("charge", d3.forceManyBody().strength(-800))
+                .force("center", d3.forceCenter(width / 2, height / 2))
+                .force("collide", d3.forceCollide().radius(40));
 
-            // Physics constants
-            const kAttractive = 0.05;
-            const kRepulsive = 2500;
-            const kGravity = 0.02;
-            const iterations = 80;
+            // Draw Links
+            link = svgGroup.append("g")
+                .selectAll("line")
+                .data(links)
+                .join("line")
+                .attr("stroke", "rgba(255, 255, 255, 0.1)")
+                .attr("stroke-width", 1.5);
 
-            // Run simulation steps
-            for (let step = 0; step < iterations; step++) {
-                // 1. Repulsive forces between nodes
-                for (let i = 0; i < nodes.length; i++) {
-                    const n1 = nodes[i];
-                    for (let j = i + 1; j < nodes.length; j++) {
-                        const n2 = nodes[j];
-                        const dx = n2.x - n1.x;
-                        const dy = n2.y - n1.y;
-                        const dist = Math.sqrt(dx*dx + dy*dy) || 1.0;
-                        
-                        // force magnitude
-                        const f = kRepulsive / (dist * dist);
-                        const fx = (dx / dist) * f;
-                        const fy = (dy / dist) * f;
+            // Link Labels
+            const linkLabels = svgGroup.append("g")
+                .selectAll("text")
+                .data(links)
+                .join("text")
+                .text(d => d.relation_type)
+                .attr("font-size", "10px")
+                .attr("fill", "rgba(255,255,255,0.3)")
+                .attr("text-anchor", "middle");
 
-                        n1.vx -= fx;
-                        n1.vy -= fy;
-                        n2.vx += fx;
-                        n2.vy += fy;
-                    }
-                }
+            // Draw Nodes
+            node = svgGroup.append("g")
+                .selectAll("g")
+                .data(nodes)
+                .join("g")
+                .call(drag(simulation));
 
-                // 2. Attractive forces along links
-                links.forEach(link => {
-                    const sNode = nodesMap.get(link.source);
-                    const tNode = nodesMap.get(link.target);
-                    if (sNode && tNode) {
-                        const dx = tNode.x - sNode.x;
-                        const dy = tNode.y - sNode.y;
-                        const dist = Math.sqrt(dx*dx + dy*dy) || 1.0;
-                        const force = kAttractive * (dist - 100); // ideal length 100
+            // Tooltip logic
+            const tooltip = d3.select("#tooltip");
 
-                        const fx = (dx / dist) * force;
-                        const fy = (dy / dist) * force;
-
-                        sNode.vx += fx;
-                        sNode.vy += fy;
-                        tNode.vx -= fx;
-                        tNode.vy -= fy;
-                    }
+            // Node Circles
+            node.append("circle")
+                .attr("r", d => d.type === 'DECISION' ? 18 : 12)
+                .attr("fill", "#0c0f1d")
+                .attr("stroke", d => {
+                    if (d.type === 'EPISODIC') return "var(--cyan)";
+                    if (d.type === 'DECISION') return "var(--rose)";
+                    return "var(--violet)";
+                })
+                .attr("stroke-width", 3)
+                .on("mouseover", function(event, d) {
+                    d3.select(this).attr("stroke-width", 5).style("filter", "drop-shadow(0 0 10px currentColor)");
+                    tooltip.transition().duration(200).style("opacity", 1);
+                    tooltip.html(`<strong>[${d.type}]</strong><br/>${d.content.substring(0,100)}...<br/><br/><span style="color:#8b949e">Confidence: ${(d.confidence*100).toFixed(0)}%</span>`)
+                        .style("left", (event.pageX + 15) + "px")
+                        .style("top", (event.pageY - 28) + "px");
+                })
+                .on("mouseout", function(event, d) {
+                    d3.select(this).attr("stroke-width", 3).style("filter", "none");
+                    tooltip.transition().duration(500).style("opacity", 0);
                 });
 
-                // 3. Gravity towards center and position updates
-                nodes.forEach(n => {
-                    const dx = width / 2 - n.x;
-                    const dy = height / 2 - n.y;
-                    n.vx += dx * kGravity;
-                    n.vy += dy * kGravity;
+            // Node Labels
+            node.append("text")
+                .text(d => d.label.length > 20 ? d.label.substring(0, 18) + '...' : d.label)
+                .attr("x", 0)
+                .attr("y", 25)
+                .attr("text-anchor", "middle")
+                .attr("fill", "var(--text-main)")
+                .attr("font-size", "11px")
+                .style("text-shadow", "0 2px 4px rgba(0,0,0,0.8)");
 
-                    // Apply damping
-                    n.vx *= 0.8;
-                    n.vy *= 0.8;
+            // Simulation Tick
+            simulation.on("tick", () => {
+                link
+                    .attr("x1", d => d.source.x)
+                    .attr("y1", d => d.source.y)
+                    .attr("x2", d => d.target.x)
+                    .attr("y2", d => d.target.y);
 
-                    // Update pos
-                    n.x += n.vx;
-                    n.y += n.vy;
-                });
+                linkLabels
+                    .attr("x", d => (d.source.x + d.target.x) / 2)
+                    .attr("y", d => (d.source.y + d.target.y) / 2 - 5);
+
+                node
+                    .attr("transform", d => `translate(${d.x}, ${d.y})`);
+            });
+        }
+
+        // D3 Drag Behavior
+        function drag(simulation) {
+            function dragstarted(event) {
+                if (!event.active) simulation.alphaTarget(0.3).restart();
+                event.subject.fx = event.subject.x;
+                event.subject.fy = event.subject.y;
             }
-
-            // Draw Links (lines)
-            links.forEach(link => {
-                const s = nodesMap.get(link.source);
-                const t = nodesMap.get(link.target);
-                if (s && t) {
-                    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                    line.setAttribute("class", "link");
-                    line.setAttribute("x1", s.x);
-                    line.setAttribute("y1", s.y);
-                    line.setAttribute("x2", t.x);
-                    line.setAttribute("y2", t.y);
-                    svg.appendChild(line);
-
-                    // Add text label along the edge
-                    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                    text.setAttribute("class", "link-label");
-                    text.setAttribute("x", (s.x + t.x) / 2);
-                    text.setAttribute("y", (s.y + t.y) / 2 - 4);
-                    text.textContent = link.label;
-                    svg.appendChild(text);
-                }
-            });
-
-            // Draw Nodes (circles + labels)
-            nodes.forEach(n => {
-                const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
-                group.setAttribute("class", `node ${n.type}`);
-                group.setAttribute("transform", `translate(${n.x}, ${n.y})`);
-
-                // Circle
-                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                circle.setAttribute("r", 15);
-                
-                // Label
-                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                text.setAttribute("y", 30);
-                
-                // Truncate long labels
-                let displayName = n.label;
-                if (displayName.length > 18) {
-                    displayName = displayName.substring(0, 15) + '...';
-                }
-                text.textContent = displayName;
-
-                group.appendChild(circle);
-                group.appendChild(text);
-                svg.appendChild(group);
-
-                // Add basic drag behavior
-                let isDragging = false;
-                group.addEventListener('mousedown', (e) => {
-                    isDragging = true;
-                    svg.style.cursor = 'grabbing';
-                });
-                
-                svg.addEventListener('mousemove', (e) => {
-                    if (isDragging) {
-                        const rect = svg.getBoundingClientRect();
-                        n.x = e.clientX - rect.left;
-                        n.y = e.clientY - rect.top;
-                        
-                        // Redraw links and node transforms
-                        redrawElements(svg, nodes, links, nodesMap);
-                    }
-                });
-
-                window.addEventListener('mouseup', () => {
-                    if (isDragging) {
-                        isDragging = false;
-                        svg.style.cursor = 'grab';
-                    }
-                });
-            });
-        }
-
-        // Quick redraw function for dragging
-        function redrawElements(svg, nodes, links, nodesMap) {
-            const lines = svg.querySelectorAll('.link');
-            const labels = svg.querySelectorAll('.link-label');
-            const nodeGroups = svg.querySelectorAll('.node');
-
-            links.forEach((link, idx) => {
-                const s = nodesMap.get(link.source);
-                const t = nodesMap.get(link.target);
-                if (s && t && lines[idx]) {
-                    lines[idx].setAttribute("x1", s.x);
-                    lines[idx].setAttribute("y1", s.y);
-                    lines[idx].setAttribute("x2", t.x);
-                    lines[idx].setAttribute("y2", t.y);
-                    
-                    if (labels[idx]) {
-                        labels[idx].setAttribute("x", (s.x + t.x) / 2);
-                        labels[idx].setAttribute("y", (s.y + t.y) / 2 - 4);
-                    }
-                }
-            });
-
-            nodes.forEach((n, idx) => {
-                if (nodeGroups[idx]) {
-                    nodeGroups[idx].setAttribute("transform", `translate(${n.x}, ${n.y})`);
-                }
-            });
-        }
-
-        function getNodeType(label) {
-            const l = label.toLowerCase();
-            if (l.includes('founder') || l.includes('developer') || l.includes('team') || l.includes('bot')) {
-                return 'actor';
+            
+            function dragged(event) {
+                event.subject.fx = event.x;
+                event.subject.fy = event.y;
             }
-            if (l.includes('.md') || l.includes('.txt') || l.includes('.json') || l.includes('document')) {
-                return 'document';
+            
+            function dragended(event) {
+                if (!event.active) simulation.alphaTarget(0);
+                event.subject.fx = null;
+                event.subject.fy = null;
             }
-            return 'concept';
+            
+            return d3.drag()
+                .on("start", dragstarted)
+                .on("drag", dragged)
+                .on("end", dragended);
         }
 
-        // Initialize Page
-        async function init() {
-            await fetchMetrics();
-            await fetchDecisions();
-            await fetchMemory();
-        }
+        // Initialize and poll
+        loadData();
+        setInterval(loadData, 15000); // Poll every 15s
 
-        init();
-        
-        // Refresh every 10 seconds
-        setInterval(init, 10000);
+        // Handle window resize for D3
+        window.addEventListener('resize', () => {
+            if(simulation) {
+                const container = document.getElementById('graph-container');
+                simulation.force("center", d3.forceCenter(container.clientWidth / 2, container.clientHeight / 2));
+                simulation.alpha(0.3).restart();
+            }
+        });
     </script>
 </body>
 </html>
