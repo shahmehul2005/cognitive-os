@@ -40,11 +40,19 @@ jobs:
           python mvp/single_pass_daemon.py
           python mvp/export_static_api.py
 
-      - name: Commit and Push Memory Graph Updates
+      - name: Commit and Push Updated Memory Graph
         run: |
-          git config --local user.email "cognitive-os@github.com"
-          git config --local user.name "Cognitive OS Daemon"
-          git add mvp/memory_db.sqlite public/api/*.json
+          git config --global user.name 'Cognitive OS Engine'
+          git config --global user.email 'cognitive-os@automation.local'
+          git add public/api/*.json
+          git add memory_db.sqlite
           # Only commit if there are changes
-          git diff --quiet && git diff --staged --quiet || git commit -m "chore: OS Memory Sync [skip ci]"
-          git push
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: auto-update memory graph API [skip ci]" && git push)
+
+      - name: Trigger Render Auto-Deploy
+        if: env.RENDER_DEPLOY_HOOK != ''
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          echo "Triggering Render deployment..."
+          curl -X POST $RENDER_DEPLOY_HOOK
