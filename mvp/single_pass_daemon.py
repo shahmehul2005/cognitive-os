@@ -52,6 +52,22 @@ def run_single_pass():
                 author_id=event.source
             )
             
+    print("[Perception] Running Goal Ingestion (GitHub Issues)...")
+    try:
+        from github_goal_sensor import GitHubGoalSensor
+        goal_sensor = GitHubGoalSensor()
+        goal_sensor.process_goals()
+    except Exception as e:
+        print(f"Goal Sensor failed: {e}")
+        
+    print("[Perception] Running Communication Sensor (Slack)...")
+    try:
+        from slack_sensor import SlackSensor
+        slack_sensor = SlackSensor()
+        slack_sensor.process_slack()
+    except Exception as e:
+        print(f"Slack Sensor failed: {e}")
+            
     print("[Consolidation] Triggering sleep cycle...")
     sleep_daemon.run_sleep_cycle()
     
