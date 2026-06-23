@@ -49,15 +49,15 @@ class GitHubGoalSensor:
             title = issue.get("title", "")
             body = issue.get("body", "") or ""
             
-            # Use Gemini to extract the core strategic intent if possible
+            # Use Gemini to extract the core technical intent if possible
             intent = title
             if gemini_client.has_api_key() and body:
-                prompt = f"Extract the core technical or business intent from this GitHub Issue in one short sentence.\nTitle: {title}\nBody: {body}"
+                prompt = f"Extract the core technical requirement, architectural decision, or engineering constraint from this GitHub Issue in one short sentence. Ignore non-technical business fluff.\nTitle: {title}\nBody: {body}"
                 extracted = gemini_client.generate_content(prompt)
                 if extracted:
                     intent = extracted.strip()
             
-            print(f"  -> Extracted Goal: {intent}")
+            print(f"  -> Extracted Tech Requirement: {intent}")
             
             payload = {
                 "title": title,
@@ -68,11 +68,11 @@ class GitHubGoalSensor:
             # Insert into TMS
             BeliefStore.insert_belief(
                 belief_id=issue_id,
-                subject="organization",
-                predicate="has_goal",
+                subject="architecture",
+                predicate="requires",
                 object_val=intent[:50], # Abbreviated for graph edge
                 payload=json.dumps(payload),
-                confidence=0.99, # Goals have high confidence until closed
+                confidence=0.99, # Requirements have high confidence until closed
                 decay_rate=0.01,
                 timestamp=time.time(),
                 status="ACTIVE",

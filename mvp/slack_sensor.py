@@ -86,8 +86,9 @@ class SlackSensor:
             
         prompt = f"""
         Analyze the following Slack conversation from an #architecture channel.
-        Did the team reach a consensus or make a structural engineering decision?
-        If YES, extract the decision in a single sentence. If NO, reply exactly with "NO_DECISION".
+        Did the engineering team reach a consensus on a technical architecture decision, tech stack choice, or engineering constraint?
+        (Do NOT extract HR, Sales, or non-technical business decisions).
+        If YES, extract the technical decision in a single clear sentence. If NO, reply exactly with "NO_DECISION".
         
         Conversation:
         {conversation}
