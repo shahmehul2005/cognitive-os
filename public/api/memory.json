@@ -1,15 +1,6 @@
 {
   "nodes": [
     {
-      "id": "mock_87664337",
-      "content": "runway is 9 months",
-      "confidence": 0.9,
-      "type": "SEMANTIC",
-      "status": "ACTIVE",
-      "created_at": 1781434034.8531377,
-      "access_count": 0
-    },
-    {
       "id": "mock_06982857",
       "content": "runway is 18 months",
       "confidence": 1.0,
@@ -46,30 +37,12 @@
       "access_count": 0
     },
     {
-      "id": "mock_91284225",
-      "content": "runway is 9 months",
-      "confidence": 0.9,
-      "type": "SEMANTIC",
-      "status": "ACTIVE",
-      "created_at": 1781435216.1710064,
-      "access_count": 0
-    },
-    {
       "id": "mock_70630582",
       "content": "runway is 18 months",
       "confidence": 1.0,
       "type": "SEMANTIC",
       "status": "ACTIVE",
       "created_at": 1781435216.208499,
-      "access_count": 0
-    },
-    {
-      "id": "claim_05034741",
-      "content": "runway revised from 18 months to 9 months",
-      "confidence": 0.9,
-      "type": "SEMANTIC",
-      "status": "ACTIVE",
-      "created_at": 1781435225.5455818,
       "access_count": 0
     },
     {
@@ -82,30 +55,12 @@
       "access_count": 0
     },
     {
-      "id": "claim_54634745",
-      "content": "runway revised from 18 months to 9 months",
-      "confidence": 0.9,
-      "type": "SEMANTIC",
-      "status": "ACTIVE",
-      "created_at": 1781435311.541239,
-      "access_count": 0
-    },
-    {
       "id": "claim_40668485",
       "content": "pi outage 3h causing customer revenue loss \u2014 p1 incident",
       "confidence": 0.97,
       "type": "SEMANTIC",
       "status": "ACTIVE",
       "created_at": 1781435311.551605,
-      "access_count": 0
-    },
-    {
-      "id": "claim_44913064",
-      "content": "runway revised from 18 months to 9 months",
-      "confidence": 0.9,
-      "type": "SEMANTIC",
-      "status": "ACTIVE",
-      "created_at": 1781435334.5885017,
       "access_count": 0
     },
     {
@@ -118,30 +73,12 @@
       "access_count": 0
     },
     {
-      "id": "claim_18639246",
-      "content": "runway revised from 18 months to 9 months",
-      "confidence": 0.9,
-      "type": "SEMANTIC",
-      "status": "ACTIVE",
-      "created_at": 1781435353.3869069,
-      "access_count": 0
-    },
-    {
       "id": "claim_91881853",
       "content": "pi outage 3h causing customer revenue loss \u2014 p1 incident",
       "confidence": 0.97,
       "type": "SEMANTIC",
       "status": "ACTIVE",
       "created_at": 1781435353.3972092,
-      "access_count": 0
-    },
-    {
-      "id": "claim_47905100",
-      "content": "runway revised from 18 months to 9 months",
-      "confidence": 0.9,
-      "type": "SEMANTIC",
-      "status": "ACTIVE",
-      "created_at": 1781435409.8309236,
       "access_count": 0
     },
     {
@@ -154,30 +91,12 @@
       "access_count": 0
     },
     {
-      "id": "claim_34934112",
-      "content": "runway revised from 18 months to 9 months",
-      "confidence": 0.9,
-      "type": "SEMANTIC",
-      "status": "ACTIVE",
-      "created_at": 1781435426.4480858,
-      "access_count": 0
-    },
-    {
       "id": "claim_59824746",
       "content": "pi outage 3h causing customer revenue loss \u2014 p1 incident",
       "confidence": 0.97,
       "type": "SEMANTIC",
       "status": "ACTIVE",
       "created_at": 1781435426.4574146,
-      "access_count": 0
-    },
-    {
-      "id": "claim_35313639",
-      "content": "runway revised from 18 months to 9 months",
-      "confidence": 0.9,
-      "type": "SEMANTIC",
-      "status": "ACTIVE",
-      "created_at": 1781435448.5645282,
       "access_count": 0
     },
     {
@@ -190,30 +109,12 @@
       "access_count": 0
     },
     {
-      "id": "claim_69940862",
-      "content": "runway revised from 18 months to 9 months",
-      "confidence": 0.9,
-      "type": "SEMANTIC",
-      "status": "ACTIVE",
-      "created_at": 1781435474.2228236,
-      "access_count": 0
-    },
-    {
       "id": "claim_06952813",
       "content": "pi outage 3h causing customer revenue loss \u2014 p1 incident",
       "confidence": 0.97,
       "type": "SEMANTIC",
       "status": "ACTIVE",
       "created_at": 1781435474.2349558,
-      "access_count": 0
-    },
-    {
-      "id": "claim_28561922",
-      "content": "runway revised from 18 months to 9 months",
-      "confidence": 0.9,
-      "type": "SEMANTIC",
-      "status": "ACTIVE",
-      "created_at": 1781435515.0580807,
       "access_count": 0
     },
     {
@@ -226,15 +127,6 @@
       "access_count": 0
     },
     {
-      "id": "claim_63999771",
-      "content": "runway revised from 18 months to 9 months",
-      "confidence": 0.9,
-      "type": "SEMANTIC",
-      "status": "ACTIVE",
-      "created_at": 1781435591.331017,
-      "access_count": 0
-    },
-    {
       "id": "claim_19080733",
       "content": "pi outage 3h causing customer revenue loss \u2014 p1 incident",
       "confidence": 0.97,
@@ -244,30 +136,12 @@
       "access_count": 0
     },
     {
-      "id": "claim_87782777",
-      "content": "runway revised from 18 months to 9 months",
-      "confidence": 0.9,
-      "type": "SEMANTIC",
-      "status": "ACTIVE",
-      "created_at": 1781435625.577584,
-      "access_count": 0
-    },
-    {
       "id": "claim_98151095",
       "content": "pi outage 3h causing customer revenue loss \u2014 p1 incident",
       "confidence": 0.97,
       "type": "SEMANTIC",
       "status": "ACTIVE",
       "created_at": 1781435625.58834,
-      "access_count": 0
-    },
-    {
-      "id": "claim_89499977",
-      "content": "runway revised from 18 months to 9 months",
-      "confidence": 0.9,
-      "type": "SEMANTIC",
-      "status": "ACTIVE",
-      "created_at": 1781435663.5499628,
       "access_count": 0
     },
     {
