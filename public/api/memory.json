@@ -1,15 +1,6 @@
 {
   "nodes": [
     {
-      "id": "mock_06982857",
-      "content": "runway is 18 months",
-      "confidence": 1.0,
-      "type": "SEMANTIC",
-      "status": "ACTIVE",
-      "created_at": 1781434034.8890448,
-      "access_count": 0
-    },
-    {
       "id": "claim_alice_valkey",
       "content": "system architecture migrate_to Valkey",
       "confidence": 0.9,
