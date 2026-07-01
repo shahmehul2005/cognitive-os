@@ -28,15 +28,6 @@
       "access_count": 0
     },
     {
-      "id": "mock_70630582",
-      "content": "runway is 18 months",
-      "confidence": 1.0,
-      "type": "SEMANTIC",
-      "status": "ACTIVE",
-      "created_at": 1781435216.208499,
-      "access_count": 0
-    },
-    {
       "id": "ep_evt_git_42ebc33d",
       "content": "Commit by Test User: chore: test new Slack and Goal sensors with real API keys",
       "confidence": 0.8,
