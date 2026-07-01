@@ -26,15 +26,6 @@
       "status": "ACTIVE",
       "created_at": 1781261360.858834,
       "access_count": 0
-    },
-    {
-      "id": "ep_evt_git_42ebc33d",
-      "content": "Commit by Test User: chore: test new Slack and Goal sensors with real API keys",
-      "confidence": 0.8,
-      "type": "EPISODIC",
-      "status": "ACTIVE",
-      "created_at": 1781720614.5735207,
-      "access_count": 0
     }
   ],
   "edges": [
